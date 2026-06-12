@@ -1,0 +1,29 @@
+// Alpine Linux 3.23 template built from the official NoCloud cloud image
+// (UEFI, cloud-init variant). cloud-init picks up the CIDATA ISO, creates
+// vmlab/vmlab and installs the QEMU guest agent. Build with:
+//
+//   vmlab template build        (run from this directory)
+//
+// Image sha512-verified against dl-cdn.alpinelinux.org, sha256 computed
+// from the verified file.
+
+import <vmlab.wcl>
+
+template "alpine-3.23" {
+  arch    = "x86_64"
+  version = "3.23.4"
+  profile = "linux-modern"
+  cpus    = 1
+  memory  = "1G"
+  disk    = "10G"
+
+  source "qcow2" {
+    url    = "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/nocloud_alpine-3.23.4-x86_64-uefi-cloudinit-r0.qcow2"
+    sha256 = "4c32a9fa451e9c2e23ae04ee2c31dddeab05e0d2a72820e0f584816299b146ef"
+  }
+
+  media { kind = "iso" from = "./cloudinit/" label = "CIDATA" }
+  nic { nat = true }
+
+  provision "scripts/install.wisp" { }
+}

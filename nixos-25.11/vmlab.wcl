@@ -1,0 +1,31 @@
+// NixOS 25.11 template built from the official minimal installer ISO.
+// The minimal ISO auto-logs-in a nixos user on tty1; the provision script
+// types one command that mounts the NIXSETUP media ISO and runs
+// install.sh from it (partition, nixos-install with ./nix/configuration.nix,
+// power off). Build with:
+//
+//   vmlab template build        (run from this directory)
+//
+// ISO pinned to the 25.11 channel build; sha256 from the .sha256 file
+// published next to it on releases.nixos.org.
+
+import <vmlab.wcl>
+
+template "nixos-25.11" {
+  arch    = "x86_64"
+  version = "25.11"
+  profile = "linux-modern"
+  cpus    = 2
+  memory  = "4G"
+  disk    = "20G"
+
+  source "iso" {
+    url    = "https://releases.nixos.org/nixos/25.11/nixos-25.11.11994.e820eb4a444b/nixos-minimal-25.11.11994.e820eb4a444b-x86_64-linux.iso"
+    sha256 = "cb47d84b72b794d72e964cbe36cf0ad4d91d4b0107545f14941f3b293b2f5291"
+  }
+
+  media { kind = "iso" from = "./nix/" label = "NIXSETUP" }
+  nic { nat = true }
+
+  provision "scripts/install.wisp" { }
+}

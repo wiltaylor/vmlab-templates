@@ -22,7 +22,10 @@ What happens (`scripts/install.wisp` narrates it in the build log):
    `vmlab123!`, and on first logon installs the virtio guest tools and the
    QEMU guest agent.
 3. The script waits for the guest agent — that's the "install finished"
-   signal — then vmlab shuts the VM down and seals the disk.
+   signal.
+4. The script stages `unattend/sysprep-unattend.xml` onto the disk and runs
+   `sysprep /generalize /oobe /shutdown`, which powers the VM off; vmlab
+   seals the generalized disk.
 
 Notes:
 
@@ -31,5 +34,8 @@ Notes:
 - The evaluation license runs 180 days from install. To move to a newer
   eval build, update `version`, the `url`, and `sha256` in `vmlab.wcl`
   (sha256: download the ISO once and `sha256sum` it).
-- All lab clones share the machine name `VMLAB-WS2025`; sysprep is out of
-  scope for this example.
+- The sealed image is **generalized**: each clone's first boot replays
+  `sysprep-unattend.xml` — fresh SID, auto-generated computer name, OOBE
+  skipped, `Administrator` / `vmlab123!` restored with one autologon — so
+  clones are domain-joinable out of the box. First boot of a clone takes a
+  few extra minutes while specialize runs.

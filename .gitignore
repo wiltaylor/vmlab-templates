@@ -4,6 +4,10 @@
 *.img
 *.msi
 *.tar.zst
+*.7z
+*.zip
 
-# virtio driver payloads pulled by fetch-deps.sh
+# staged by each template's fetch-deps.sh
 windows-server-2025/unattend/drivers/
+kali/disk/
+parrot/disk/

@@ -1,0 +1,28 @@
+// Fedora 44 template built from the official Cloud Base Generic qcow2.
+// cloud-init picks up the CIDATA ISO (NoCloud), creates vmlab/vmlab and
+// installs the QEMU guest agent. Build with:
+//
+//   vmlab template build        (run from this directory)
+//
+// sha256 from the official Fedora-Cloud-44-1.7-x86_64-CHECKSUM file.
+
+import <vmlab.wcl>
+
+template "fedora-44" {
+  arch    = "x86_64"
+  version = "44.1.7"
+  profile = "linux-modern"
+  cpus    = 2
+  memory  = "2G"
+  disk    = "20G"
+
+  source "qcow2" {
+    url    = "https://download.fedoraproject.org/pub/fedora/linux/releases/44/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-44-1.7.x86_64.qcow2"
+    sha256 = "28680fe5b371a5a82ebf43a31926e086a168e59949d03969c5093e7071f90b7f"
+  }
+
+  media { kind = "iso" from = "./cloudinit/" label = "CIDATA" }
+  nic { nat = true }
+
+  provision "scripts/install.wisp" { }
+}

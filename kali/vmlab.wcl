@@ -1,0 +1,26 @@
+// Kali Linux template built from the official prebuilt QEMU image.
+// Kali ships it 7z-compressed, so fetch-deps.sh downloads, verifies and
+// extracts it first (vmlab URL sources need a raw qcow2):
+//
+//   ./fetch-deps.sh             # one-time: ~3.5G download into disk/
+//   vmlab template build        (run from this directory)
+//
+// The provision script waits for the QEMU guest agent (preinstalled in
+// Kali's QEMU image), adds the vmlab user and enables SSH.
+
+import <vmlab.wcl>
+
+template "kali" {
+  arch    = "x86_64"
+  version = "2026.1"
+  profile = "linux-generic"
+  cpus    = 2
+  memory  = "4G"
+  disk    = "40G"
+
+  source "qcow2" { path = "./disk/kali.qcow2" }
+
+  nic { nat = true }
+
+  provision "scripts/install.wisp" { }
+}

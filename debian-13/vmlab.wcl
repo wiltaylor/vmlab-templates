@@ -1,0 +1,30 @@
+// Debian 13 (trixie) template built from the official genericcloud qcow2.
+// cloud-init picks up the CIDATA ISO (NoCloud), creates vmlab/vmlab,
+// installs the QEMU guest agent and the provision script confirms the
+// agent answers before the image is sealed. Build with:
+//
+//   vmlab template build        (run from this directory)
+//
+// Image pinned to cloud build 20260601-2496; sha512-verified against
+// cloud.debian.org SHA512SUMS, sha256 computed from the verified file.
+
+import <vmlab.wcl>
+
+template "debian-13" {
+  arch    = "x86_64"
+  version = "13.20260601"
+  profile = "linux-modern"
+  cpus    = 2
+  memory  = "2G"
+  disk    = "20G"
+
+  source "qcow2" {
+    url    = "https://cloud.debian.org/images/cloud/trixie/20260601-2496/debian-13-genericcloud-amd64-20260601-2496.qcow2"
+    sha256 = "e5ef082958bae3763ba664a6365096d2cd29332ae78dc2d03549ab26b6b98ea8"
+  }
+
+  media { kind = "iso" from = "./cloudinit/" label = "CIDATA" }
+  nic { nat = true }
+
+  provision "scripts/install.wisp" { }
+}

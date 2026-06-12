@@ -10,13 +10,13 @@ template: `cd` into it and run `vmlab template build`.
 |---|---|---|
 | `ubuntu-24.04/` | Ubuntu Server 24.04 LTS | Installer ISO + subiquity autoinstall |
 | `debian-13/` | Debian 13 (trixie) | Cloud qcow2 + cloud-init |
-| `fedora-42/` | Fedora 42 | Cloud Base qcow2 + cloud-init |
+| `fedora-44/` | Fedora 44 | Cloud Base qcow2 + cloud-init |
 | `rocky-9/` | Rocky Linux 9 | GenericCloud qcow2 + cloud-init |
-| `alpine-3.21/` | Alpine Linux 3.21 | NoCloud qcow2 + cloud-init |
-| `nixos-25.05/` | NixOS 25.05 | Minimal ISO + scripted nixos-install |
-| `kali/` | Kali Linux (rolling) | Official QEMU qcow2 + console provision |
-| `parrot/` | Parrot OS Security | See its README |
-| `windows-server-2025/` | Windows Server 2025 Eval | Installer ISO + autounattend (run `fetch-deps.sh` first) |
+| `alpine-3.23/` | Alpine Linux 3.23 | NoCloud qcow2 + cloud-init |
+| `nixos-25.11/` | NixOS 25.11 | Minimal ISO + scripted nixos-install |
+| `kali/` | Kali Linux 2026.1 | Official QEMU qcow2 (run `fetch-deps.sh` first) |
+| `parrot/` | Parrot OS Security 7.2 | Official QEMU qcow2 (run `fetch-deps.sh` first) |
+| `windows-server-2025/` | Windows Server 2025 Eval | Installer ISO + autounattend, sysprep-generalized (run `fetch-deps.sh` first) |
 
 ## Conventions
 
