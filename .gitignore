@@ -1,0 +1,9 @@
+# Downloaded build payloads — fetched on demand, never committed.
+*.iso
+*.qcow2
+*.img
+*.msi
+*.tar.zst
+
+# virtio driver payloads pulled by fetch-deps.sh
+windows-server-2025/unattend/drivers/
