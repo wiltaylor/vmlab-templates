@@ -31,7 +31,9 @@ osdir() {
     exit 1
 }
 
+chmod -R u+w unattend 2>/dev/null || true
 rm -rf unattend/drivers
+rm -f unattend/*.msi
 for drv in viostor NetKVM; do
     os=$(osdir "$drv")
     dest="unattend/drivers/${drv,,}"

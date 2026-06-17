@@ -4,10 +4,11 @@
 // install is done — autounattend.xml installs the QEMU guest agent as its
 // last first-logon command, so "agent responding" means finished.
 //
-// The image is then generalized: sysprep /generalize /oobe /shutdown with
-// unattend/sysprep-unattend.xml, so every clone gets a fresh SID and a
-// random computer name and can join a domain. Sysprep powers the VM off
-// and the build seals the generalized disk.
+// The image is then generalized. Client SKUs make sysprep /generalize abort
+// on a "package installed for a user but not provisioned" AppX mismatch, so
+// we strip per-user + provisioned AppX first, then run sysprep with
+// unattend/sysprep-unattend.xml so every clone gets a fresh SID and a random
+// computer name. We power the VM off and seal the generalized disk.
 
 use vmlab
 
@@ -46,9 +47,9 @@ fn install(lab: Lab) -> Result[unit, string] {
     sysprep(lab, vm)
 }
 
-// Generalize the image so clones get fresh SIDs (domain-joinable). The
-// answer file rides the UNATTEND ISO; copy it onto the disk first since
-// the ISO is not attached to lab clones.
+// Generalize the image so clones get fresh SIDs (domain-joinable). The answer
+// file rides the UNATTEND ISO; copy it onto the disk first since the ISO is
+// not attached to lab clones.
 fn sysprep(lab: Lab, vm: Vm) -> Result[unit, string] {
     let copy = vm.exec("cmd.exe", [
         "/c",
@@ -58,19 +59,41 @@ fn sysprep(lab: Lab, vm: Vm) -> Result[unit, string] {
         return Err("could not stage sysprep-unattend.xml: " + copy.stderr)
     }
 
-    lab.log("running sysprep /generalize (5-10 minutes, powers the VM off)...")
-    // Fire-and-forget via start: sysprep shuts the guest down, which kills
-    // the agent connection mid-exec — an Err here is expected noise.
-    match vm.exec_timeout("cmd.exe", [
-        "/c",
-        "start C:\\Windows\\System32\\Sysprep\\sysprep.exe /generalize /oobe /shutdown /quiet /unattend:C:\\Windows\\Temp\\sysprep-unattend.xml",
-    ], 60) {
-        Ok(_)  => lab.log("sysprep launched"),
-        Err(e) => lab.log("sysprep launch returned an error (often benign): " + e),
+    // sysprep /generalize aborts on Win10/11 client SKUs when an AppX package
+    // is installed for a user but not provisioned for all users. Removing the
+    // per-user and provisioned packages clears the mismatch (harmless on
+    // Server, which carries few/no such packages).
+    lab.log("removing AppX packages so sysprep /generalize won't abort...")
+    let strip = vm.exec_timeout("powershell.exe", [
+        "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command",
+        "Get-AppxPackage -AllUsers | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue; Get-AppxProvisionedPackage -Online | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName -ErrorAction SilentlyContinue }",
+    ], 2400)
+    match strip {
+        Ok(r)  => lab.log("AppX strip done (exit " + fmt("{}", r.exit_code) + ")"),
+        Err(e) => lab.log("AppX strip returned an error (continuing): " + e),
     }
 
-    vm.wait_shutdown(1800)?
-    lab.log("sysprep finished; sealing the generalized image")
+    // Run sysprep with /quit (not /shutdown) so we can read its exit code and
+    // surface the Panther log on failure, instead of blindly waiting out a
+    // poweroff that never comes.
+    lab.log("running sysprep /generalize (5-10 minutes)...")
+    let sp = vm.exec_timeout("C:\\Windows\\System32\\Sysprep\\sysprep.exe", [
+        "/generalize", "/oobe", "/quit", "/quiet",
+        "/unattend:C:\\Windows\\Temp\\sysprep-unattend.xml",
+    ], 2400)?
+    if sp.exit_code != 0 {
+        match vm.exec("powershell.exe", [
+            "-NoProfile", "-Command",
+            "Get-Content C:\\Windows\\System32\\Sysprep\\Panther\\setupact.log -Tail 80",
+        ]) {
+            Ok(r)  => return Err("sysprep /generalize failed (exit " + fmt("{}", sp.exit_code) + "); setupact.log tail:\n" + r.stdout),
+            Err(_) => return Err("sysprep /generalize failed (exit " + fmt("{}", sp.exit_code) + ")"),
+        }
+    }
+
+    lab.log("sysprep generalized OK; powering off to seal")
+    let shut = vm.exec_timeout("cmd.exe", ["/c", "shutdown /s /t 0"], 60)
+    vm.wait_shutdown(900)?
     Ok(())
 }
 
