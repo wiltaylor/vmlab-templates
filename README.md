@@ -17,6 +17,14 @@ template: `cd` into it and run `vmlab template build`.
 | `kali/` | Kali Linux 2026.1 | Official QEMU qcow2 (run `fetch-deps.sh` first) |
 | `parrot/` | Parrot OS Security 7.2 | Official QEMU qcow2 (run `fetch-deps.sh` first) |
 | `windows-server-2025/` | Windows Server 2025 Eval | Installer ISO + autounattend, sysprep-generalized (run `fetch-deps.sh` first) |
+| `windows-server-2022/` | Windows Server 2022 Eval | Installer ISO + autounattend, sysprep-generalized (run `fetch-deps.sh` first) |
+| `windows-server-2019/` | Windows Server 2019 Eval | Installer ISO + autounattend, sysprep-generalized (run `fetch-deps.sh` first) |
+| `windows-11/` | Windows 11 Enterprise Eval | Installer ISO + autounattend, sysprep-generalized (run `fetch-deps.sh` first) |
+| `windows-10/` | Windows 10 Enterprise Eval | Installer ISO + autounattend, sysprep-generalized (run `fetch-deps.sh` first) |
+
+All Windows eval ISOs are downloaded and sha256-verified by vmlab just like the
+Linux ones; `fetch-deps.sh` only fetches the virtio guest drivers that get baked
+into the answer-file media (and `just` runs it for you).
 
 ### arm64 (aarch64)
 
@@ -30,6 +38,11 @@ they run under **TCG** (no KVM), so builds are slow.
 | `debian-13-arm64/` | Debian 13 (trixie) | `aarch64/debian-13` |
 | `fedora-44-arm64/` | Fedora 44 | `aarch64/fedora-44` |
 | `ubuntu-arm64/` | Ubuntu Server 24.04 LTS | `aarch64/ubuntu-24.04` |
+
+`windows-11-arm64/` also exists but is **experimental and not part of
+`just build-arm64`**: Microsoft publishes no stable ARM64 eval ISO link/hash, so
+you must fill in `url`/`sha256`/`version` in its `vmlab.wcl` first, then build it
+on its own with `just windows-11-arm64-build`. See its README.
 
 ## Conventions
 
