@@ -11,3 +11,6 @@
 windows-server-2025/unattend/drivers/
 kali/disk/
 parrot/disk/
+
+# Product keys for the MSDN/VL ISOs in iso/ — never commit real keys
+.env
