@@ -1,7 +1,9 @@
-// windows-2000 template (PRD §6.1). Pre-autounattend.xml era guest on the windows-9x
-// profile (i440fx/SeaBIOS/IDE, Cirrus VGA, AMD PCnet NIC). The installer is
-// driven by the build provision wisp via screenshots + keyboard/mouse, since
-// these OSes have no answer-file auto-load and no QEMU guest agent.
+// windows-2000 template (PRD §6.1). Windows 2000 Professional SP4 on the
+// windows-9x profile (i440fx/SeaBIOS/IDE, Cirrus VGA, AMD PCnet NIC). The
+// bootable CD installs unattended: Setup reads A:\winnt.sif (the answer floppy
+// built from ./answer/ by fetch-deps.sh, key injected from .env) automatically.
+// No guest agent on Win2000, so the build provision wisp only nudges the
+// CD-boot prompt and watches the screen until the desktop appears.
 
 import <vmlab.wcl>
 
@@ -14,5 +16,7 @@ template "windows-2000" {
   disk    = "10G"
 
   source "iso" { path = "../iso/Windows-2000-Professional-SP4.iso" }
+  // Unattended answer file: CD-boot Setup auto-reads A:\winnt.sif.
+  media { kind = "floppy" from = "./answer/" label = "WINNT" }
   provision "scripts/install.wisp" { }
 }

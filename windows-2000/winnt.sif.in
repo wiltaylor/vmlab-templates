@@ -1,0 +1,44 @@
+; Windows 2000 Professional unattended answer file (vmlab).
+; CD-boot Setup reads this automatically from A:\winnt.sif. The product key is
+; injected from .env (WINDOWS_2000_PRO_KEY) by fetch-deps.sh.
+[Data]
+AutoPartition=1
+MsDosInitiated=0
+UnattendedInstall=Yes
+
+[Unattended]
+UnattendMode=FullUnattended
+OemSkipEula=Yes
+OemPreinstall=No
+TargetPath=\WINNT
+DriverSigningPolicy=Ignore
+
+[GuiUnattended]
+AdminPassword=vmlab
+AutoLogon=Yes
+AutoLogonCount=1
+TimeZone=85
+OemSkipWelcome=1
+OEMSkipRegional=1
+
+[UserData]
+FullName="vmlab"
+OrgName="vmlab"
+ComputerName=VMLAB-W2K
+ProductKey="__PRODUCT_KEY__"
+
+[RegionalSettings]
+LanguageGroup=1
+Language=00000409
+
+[Identification]
+JoinWorkgroup=WORKGROUP
+
+[Networking]
+InstallDefaultComponents=Yes
+
+[Display]
+BitsPerPel=8
+XResolution=640
+YResolution=480
+VRefresh=60
