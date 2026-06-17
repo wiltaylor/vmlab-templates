@@ -1,0 +1,35 @@
+// Home Assistant OS for aarch64, built from the official **generic-aarch64**
+// image. The literal Raspberry Pi image (haos_rpi4-64) boots via U-Boot and
+// will not run in a VM; generic-aarch64 is the same Home Assistant OS built
+// for UEFI (GRUB2), so it boots on the QEMU `virt` machine — this is the
+// image HA documents for QEMU/KVM. Runs under TCG on x86 hosts (no KVM).
+//
+// HAOS is a sealed appliance: no QEMU guest agent and no cloud-init, so
+// vmlab cannot `exec`/provision into it. You drive it through its web UI —
+// in a lab, forward a host port to the guest's :8123. This build just boots
+// the pristine image once and seals it (first-boot setup re-runs in the lab).
+//
+//   vmlab template build        (run from this directory)
+//
+// sha256 is GitHub's published digest for the .qcow2.xz asset.
+
+import <vmlab.wcl>
+
+template "home-assistant" {
+  arch     = "aarch64"
+  version  = "17.3"
+  profile  = "linux-modern"
+  firmware = "ovmf"
+  cpus     = 2
+  memory   = "2G"
+  disk     = "32G"
+
+  source "qcow2" {
+    url    = "https://github.com/home-assistant/operating-system/releases/download/17.3/haos_generic-aarch64-17.3.qcow2.xz"
+    sha256 = "f5b2f350557cfff91b4d2e33777b623c0203858d94a116b29962c8147ab456e5"
+  }
+
+  nic { nat = true }
+
+  provision "scripts/install.wisp" { }
+}

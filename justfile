@@ -67,13 +67,17 @@ debian-arm64-build: (template-build 'debian-13-arm64' 'aarch64/debian-13')
 [group('build-arm64')]
 fedora-arm64-build: (template-build 'fedora-44-arm64' 'aarch64/fedora-44')
 
+# Build the Home Assistant OS aarch64 template (runs under TCG on x86 hosts)
+[group('build-arm64')]
+home-assistant-arm64-build: (template-build 'home-assistant-aarch64' 'aarch64/home-assistant')
+
 # Build the Ubuntu Server 24.04 arm64 template (runs under TCG on x86 hosts)
 [group('build-arm64')]
 ubuntu-arm64-build: (template-build 'ubuntu-arm64' 'aarch64/ubuntu-24.04')
 
 # Build every arm64 template into the local store (slow under TCG)
 [group('build-arm64')]
-build-arm64: alpine-arm64-build debian-arm64-build fedora-arm64-build ubuntu-arm64-build
+build-arm64: alpine-arm64-build debian-arm64-build fedora-arm64-build home-assistant-arm64-build ubuntu-arm64-build
 
 # Build the Debian 13 riscv64 template (runs under TCG on x86 hosts)
 [group('build-riscv64')]
