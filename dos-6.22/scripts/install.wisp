@@ -1,60 +1,108 @@
-// Drive the MS-DOS 6.22 install. The bootable CD lands at an A:\> prompt with
-// the CD at R: (Oak IDE driver + MSCDEX, banner line "Driver BANANA"). We
-// partition + format C:, copy the DOS files, write minimal boot files, then
-// halt so the build seals the bootable C: disk. DOS has no guest agent, so
-// every step is keyboard-driven against the live screen via OCR waits + typing.
+// Drive the MS-DOS 6.22 install. The bootable CD lands at A:\> with the CD at
+// R: (Oak IDE driver + MSCDEX, banner "Driver BANANA"). We partition + format
+// C:, copy the DOS files into C:\DOS, set a PATH, then halt so the build seals
+// the bootable C: disk. DOS has no guest agent, so it's driven by the live
+// screen.
+//
+// Real-mode keyboard input is occasionally dropped (and the scripted shift
+// modifier is unreliable, so everything typed is lowercase — DOS is
+// case-insensitive). Every input that must land is therefore verified against
+// the screen (OCR) and retried if the expected result didn't appear; OCR-robust
+// markers are used (e.g. "Format complete", not "Volume label" whose V misreads).
 
 use vmlab
 
-fn wait_prompt(vm: Vm) -> Result[unit, string] {
-    // The MSCDEX banner ("Driver BANANA unit 0") prints just before A:\>.
-    vm.wait_for_text("BANANA", 180)?
-    vmlab::sleep_ms(2500)
-    Ok(())
+// Press Enter until `expect` appears (drives fdisk's default-selected menus).
+fn enter_until(vm: Vm, expect: string, timeout: int) -> Result[unit, string] {
+    for attempt in 0..8 {
+        vm.send_keys("enter")?
+        match vm.wait_for_text(expect, timeout) {
+            Ok(_)  => return Ok(()),
+            Err(_) => vmlab::sleep_ms(400),
+        }
+    }
+    Err("fdisk: never reached screen matching: " + expect)
+}
+
+// Type `text`, then confirm `expect` appears, retrying the input if dropped.
+fn type_until(vm: Vm, text: string, expect: string, timeout: int) -> Result[unit, string] {
+    for attempt in 0..6 {
+        vm.type_text(text)?
+        match vm.wait_for_text(expect, timeout) {
+            Ok(_)  => return Ok(()),
+            Err(_) => vmlab::sleep_ms(500),
+        }
+    }
+    Err("never saw expected output: " + expect)
+}
+
+// `md` is silent, so create C:\DOS and confirm it via `dir`, retrying.
+fn ensure_dos_dir(vm: Vm) -> Result[unit, string] {
+    for attempt in 0..5 {
+        vm.type_text("md c:\\dos\n")?
+        vmlab::sleep_ms(400)
+        vm.type_text("dir c:\\\n")?
+        match vm.wait_for_text("DOS", 8) {
+            Ok(_)  => return Ok(()),
+            Err(_) => vmlab::sleep_ms(400),
+        }
+    }
+    Err("could not create C:\\DOS")
 }
 
 fn install(lab: Lab) -> Result[unit, string] {
     let vm = lab.vm("build")?
-    wait_prompt(vm)?
 
-    // 1. Partition C: with fdisk: Create (1) -> Primary (1) -> max size + active (Y).
+    // CD boots to A:\> — the MSCDEX banner ("Driver BANANA") prints just before.
+    vm.wait_for_text("BANANA", 180)?
+    vmlab::sleep_ms(2500)
+
+    // Partition C: with fdisk (create primary, max size, active), then reboot.
     lab.log("partitioning C: with fdisk")
-    vm.type_text("fdisk\n")?;  vmlab::sleep_ms(3500)
-    vm.type_text("1\n")?;      vmlab::sleep_ms(2500)   // 1 = Create DOS partition
-    vm.type_text("1\n")?;      vmlab::sleep_ms(2500)   // 1 = Create Primary DOS Partition
-    vm.type_text("\n")?;       vmlab::sleep_ms(3500)   // Y (max size + set active) default
-    vm.type_text("\n")?;       vmlab::sleep_ms(2500)   // "press any key" -> restart
+    type_until(vm, "fdisk\n", "Set active partition", 20)?   // fdisk main menu
+    enter_until(vm, "Create Extended", 6)?                   // -> Create-partition submenu
+    enter_until(vm, "maximum available", 6)?                 // -> Create Primary, max-size prompt
+    enter_until(vm, "now restart", 6)?                       // accept [Y] -> "now restart"
+    enter_until(vm, "BANANA", 60)?                           // press-any-key -> reboot -> A:\>
+    vmlab::sleep_ms(2500)
 
-    // 2. Reboot lands back on the CD; C: is active but unformatted.
-    wait_prompt(vm)?
-
-    // 3. Format C: with system files -> bootable.
+    // Format C: with system files -> bootable.
     lab.log("formatting C: /s")
-    vm.type_text("format c: /s\n")?; vmlab::sleep_ms(3000)
-    vm.type_text("y\n")?                                 // Proceed with Format (Y/N)?
-    vm.wait_for_text("Volume label", 120)?
-    vm.type_text("\n")?;       vmlab::sleep_ms(2500)     // no volume label
+    type_until(vm, "format c: /s\n", "Proceed with Format", 20)?
+    type_until(vm, "y\n", "Format complete", 120)?
+    type_until(vm, "\n", "Serial Number", 30)?               // no volume label
+    vmlab::sleep_ms(1500)
 
-    // 4. Copy the DOS utilities to C:\DOS.
+    // Create C:\DOS and copy the utilities there.
     lab.log("copying DOS files to C:\\DOS")
-    vm.type_text("md c:\\dos\n")?; vmlab::sleep_ms(1200)
-    vm.type_text("copy r:\\*.* c:\\dos\n")?
-    vm.wait_for_text("copied", 120)?
-    vmlab::sleep_ms(2000)
+    ensure_dos_dir(vm)?
+    type_until(vm, "copy r:\\*.* c:\\dos\n", "copied", 120)?
+    vmlab::sleep_ms(1500)
 
-    // 5. Minimal boot files in C:\ root.
-    vm.type_text("echo PATH C:\\DOS> c:\\autoexec.bat\n")?;  vmlab::sleep_ms(600)
-    vm.type_text("echo PROMPT $P$G>> c:\\autoexec.bat\n")?;  vmlab::sleep_ms(600)
-    vm.type_text("echo FILES=30> c:\\config.sys\n")?;        vmlab::sleep_ms(600)
-    vm.type_text("echo BUFFERS=20>> c:\\config.sys\n")?;     vmlab::sleep_ms(1500)
+    // PATH so the DOS utilities resolve (lowercase; DOS is case-insensitive).
+    write_path(vm)?
 
-    // DOS has no ACPI, so the build's graceful stop can't power it off — halt
-    // from idle ourselves (no writes are in flight at A:\>, so the qcow2 is
-    // consistent).
-    lab.log("MS-DOS 6.22 installed to C:; halting to seal")
+    // DOS has no ACPI, so the build's graceful stop can't power it off. A clean
+    // QMP quit exits QEMU *and flushes the disk* (a SIGKILL would drop unflushed
+    // qcow2 writes and leave the image unbootable).
+    lab.log("MS-DOS 6.22 installed to C:; powering off to seal")
     vmlab::sleep_ms(3000)
-    vm.stop_force()?
+    vm.poweroff()?
     Ok(())
+}
+
+// Write a PATH into C:\AUTOEXEC.BAT and verify it stuck, retrying the echo.
+fn write_path(vm: Vm) -> Result[unit, string] {
+    for attempt in 0..5 {
+        vm.type_text("echo path c:\\dos> c:\\autoexec.bat\n")?
+        vmlab::sleep_ms(400)
+        vm.type_text("type c:\\autoexec.bat\n")?
+        match vm.wait_for_text("path c", 8) {
+            Ok(_)  => return Ok(()),
+            Err(_) => vmlab::sleep_ms(400),
+        }
+    }
+    Err("could not write C:\\AUTOEXEC.BAT")
 }
 
 fn main(lab: Lab) {
