@@ -1,0 +1,18 @@
+// dos-6.22 template (PRD §6.1). Pre-autounattend.xml era guest on the windows-9x
+// profile (i440fx/SeaBIOS/IDE, Cirrus VGA, AMD PCnet NIC). The installer is
+// driven by the build provision wisp via screenshots + keyboard/mouse, since
+// these OSes have no answer-file auto-load and no QEMU guest agent.
+
+import <vmlab.wcl>
+
+template "dos-6.22" {
+  arch    = "x86"
+  version = "6.22"
+  profile = "windows-9x"
+  cpus    = 1
+  memory  = "32M"
+  disk    = "1G"
+
+  source "iso" { path = "../iso/MS-DOS-6.22-bootable.iso" }
+  provision "scripts/install.wisp" { }
+}
