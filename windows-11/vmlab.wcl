@@ -1,0 +1,31 @@
+// Windows 11 Enterprise (Evaluation) template (PRD §6.1). Fully unattended:
+// unattend/ is packed into an ISO carrying autounattend.xml, the virtio
+// storage/net drivers Windows Setup needs (the windows-11 profile uses
+// virtio disk + NIC), and the guest tooling MSIs installed on first logon.
+//
+//   ./fetch-deps.sh        # one-time: pull virtio drivers + MSIs into unattend/
+//   vmlab template build   # ~30-45 minutes
+//
+// The windows-11 profile supplies the TPM 2.0 + secure boot Windows 11
+// requires. The eval ISO is licensed for 90 days — see README.md.
+
+import <vmlab.wcl>
+
+template "windows-11" {
+  arch    = "x86_64"
+  version = "26100.1742"
+  profile = "windows-11"
+  cpus    = 4
+  memory  = "8G"
+  disk    = "60G"
+
+  source "iso" {
+    url    = "https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26100.1742.240906-0331.ge_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso"
+    sha256 = "755a90d43e826a74b9e1932a34788b898e028272439b777e5593dee8d53622ae"
+  }
+
+  media { kind = "iso" from = "./unattend/" label = "UNATTEND" }
+  nic { nat = true }
+
+  provision "scripts/install.wisp" { }
+}

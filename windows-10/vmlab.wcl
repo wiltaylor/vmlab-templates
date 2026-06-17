@@ -1,0 +1,31 @@
+// Windows 10 Enterprise (Evaluation) template (PRD §6.1). Fully unattended:
+// unattend/ is packed into an ISO carrying autounattend.xml, the virtio
+// storage/net drivers Windows Setup needs (the windows-10 profile uses
+// virtio disk + NIC), and the guest tooling MSIs installed on first logon.
+//
+//   ./fetch-deps.sh        # one-time: pull virtio drivers + MSIs into unattend/
+//   vmlab template build   # ~30-45 minutes
+//
+// Windows 10 needs no TPM/secure boot, so the windows-10 profile leaves
+// both off. The eval ISO is licensed for 90 days — see README.md.
+
+import <vmlab.wcl>
+
+template "windows-10" {
+  arch    = "x86_64"
+  version = "19045.2006"
+  profile = "windows-10"
+  cpus    = 4
+  memory  = "8G"
+  disk    = "60G"
+
+  source "iso" {
+    url    = "https://software-static.download.prss.microsoft.com/dbazure/988969d5-f34g-4e03-ac9d-1f9786c66750/19045.2006.220908-0225.22h2_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso"
+    sha256 = "ef7312733a9f5d7d51cfa04ac497671995674ca5e1058d5164d6028f0938d668"
+  }
+
+  media { kind = "iso" from = "./unattend/" label = "UNATTEND" }
+  nic { nat = true }
+
+  provision "scripts/install.wisp" { }
+}
