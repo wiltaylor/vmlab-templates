@@ -1,7 +1,8 @@
 # Registry namespace that `*-push` / `push` upload to: templates land under
-# `<registry>/<name>:<version>`. Override per-invocation, e.g.
+# `<registry>/<name>:<version>`. The GHCR namespace must be lowercase (org
+# VMLabDev -> vmlabdev). Override per-invocation, e.g.
 # `just registry=ghcr.io/you/vmlab-templates push`.
-registry := "ghcr.io/wiltaylor/vmlab-templates"
+registry := "ghcr.io/vmlabdev/vmlab-templates"
 
 [default, private]
 main:
