@@ -1,3 +1,7 @@
+# Registry namespace that `*-push` / `push` upload to. Override per-invocation,
+# e.g. `just registry=ghcr.io/you push`.
+registry := "ghcr.io/wiltaylor"
+
 [default, private]
 main:
 	@just --list
@@ -190,3 +194,69 @@ ubuntu-riscv64-build: (template-build 'ubuntu-riscv64' 'riscv64/ubuntu-24.04')
 # Build every riscv64 template into the local store (slow under TCG)
 [group('build-riscv64')]
 build-riscv64: debian-riscv64-build fedora-riscv64-build ubuntu-riscv64-build
+
+# --- Push built templates to an OCI registry (PRD §6.4) ---
+# Upload a template already in the local store to `{{ registry }}`. The version
+# is taken from the store and laid out as the final repo path segment, so each
+# `arch/name` pushes to `{{ registry }}/<name>/<version>`; pushing several
+# arches of the same name+version merges them into one multi-arch index. Run a
+# build (or `just build`) first — push uploads what is in the store, it does not
+# build. Only the download-backed Linux templates are wired up here; the Windows
+# templates are deliberately omitted (their eval/VL media is not ours to
+# redistribute). Authenticate once with `vmlab template login` beforehand.
+
+# Push one store ref (`<arch>/<name>[@<version>]`) to `{{ registry }}/<name>`
+[group('push')]
+template-push ref name:
+	vmlab template push '{{ ref }}' '{{ registry }}/{{ name }}'
+
+[group('push')]
+alpine-push: (template-push 'x86_64/alpine-3.23' 'alpine-3.23')
+[group('push')]
+debian-push: (template-push 'x86_64/debian-13' 'debian-13')
+[group('push')]
+fedora-push: (template-push 'x86_64/fedora-44' 'fedora-44')
+[group('push')]
+kali-push: (template-push 'x86_64/kali' 'kali')
+[group('push')]
+nixos-push: (template-push 'x86_64/nixos-25.11' 'nixos-25.11')
+[group('push')]
+parrot-push: (template-push 'x86_64/parrot' 'parrot')
+[group('push')]
+rocky-push: (template-push 'x86_64/rocky-9' 'rocky-9')
+[group('push')]
+ubuntu-push: (template-push 'x86_64/ubuntu-24.04' 'ubuntu-24.04')
+
+[group('push')]
+alpine-arm64-push: (template-push 'aarch64/alpine-3.23' 'alpine-3.23')
+[group('push')]
+debian-arm64-push: (template-push 'aarch64/debian-13' 'debian-13')
+[group('push')]
+fedora-arm64-push: (template-push 'aarch64/fedora-44' 'fedora-44')
+[group('push')]
+home-assistant-arm64-push: (template-push 'aarch64/home-assistant' 'home-assistant')
+[group('push')]
+ubuntu-arm64-push: (template-push 'aarch64/ubuntu-24.04' 'ubuntu-24.04')
+
+[group('push')]
+debian-riscv64-push: (template-push 'riscv64/debian-13' 'debian-13')
+[group('push')]
+fedora-riscv64-push: (template-push 'riscv64/fedora-42' 'fedora-42')
+[group('push')]
+ubuntu-riscv64-push: (template-push 'riscv64/ubuntu-24.04' 'ubuntu-24.04')
+
+# Push every arm64 template (merges into the shared multi-arch indexes)
+[group('push')]
+push-arm64: alpine-arm64-push debian-arm64-push fedora-arm64-push home-assistant-arm64-push ubuntu-arm64-push
+
+# Push every riscv64 template (merges into the shared multi-arch indexes)
+[group('push')]
+push-riscv64: debian-riscv64-push fedora-riscv64-push ubuntu-riscv64-push
+
+# Push every download-backed Linux template (x86_64 + arm64 + riscv64) to the registry
+[group('push')]
+push: alpine-push debian-push fedora-push kali-push nixos-push parrot-push rocky-push ubuntu-push push-arm64 push-riscv64
+
+# Build everything `just build` covers, then push the Linux templates upstream
+[group('push')]
+release: build push
