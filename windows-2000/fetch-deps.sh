@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Stage the unattended answer floppy for Windows 2000 setup.
-#
-# CD-boot Setup automatically reads A:\winnt.sif; we build that floppy from
-# ./answer/ (gitignored — it carries the product key). The key comes from .env
-# (WINDOWS_2000_PRO_KEY); winnt.sif.in holds everything else with a placeholder.
+# Stage the Windows 2000 build inputs, injecting the product key from .env so no
+# key is ever committed:
+#   - answer/winnt.sif  (the unattended answer floppy, read as A:\winnt.sif)
+#   - scripts/install.wisp  (the GUI key is typed here too, since retail media
+#     ignores winnt.sif's ProductKey — see install.wisp.in)
+# Both are generated from *.in templates and are gitignored.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -14,4 +15,8 @@ if [ -f ../.env ]; then set -a; . ../.env; set +a; fi
 rm -rf answer
 mkdir -p answer
 sed "s/__PRODUCT_KEY__/${WINDOWS_2000_PRO_KEY}/" winnt.sif.in > answer/winnt.sif
-echo "staged answer/winnt.sif (key injected from .env)"
+
+# The GUI key page has 5 auto-advancing boxes, so type the key without dashes.
+sed "s/__PRODUCT_KEY__/${WINDOWS_2000_PRO_KEY//-/}/" scripts/install.wisp.in > scripts/install.wisp
+
+echo "staged answer/winnt.sif + scripts/install.wisp (key injected from .env)"

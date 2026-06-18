@@ -67,9 +67,13 @@ windows-11-build: (template-build 'windows-11' 'x86_64/windows-11')
 [group('build')]
 windows-10-build: (template-build 'windows-10' 'x86_64/windows-10')
 
-# Build every x86_64 template into the local store
+# Build every download-backed template on a clean machine: x86_64 natively,
+# then the slower TCG arm64 + riscv64 groups. Everything here fetches its own
+# media (URL sources / fetch-deps.sh), so no files need to be placed by hand.
+# The local-media Windows (`build-windows-local`) and vintage (`build-vintage`)
+# groups are NOT included — those need their ISOs copied into iso/ first.
 [group('build')]
-build: alpine-build debian-build fedora-build kali-build nixos-build parrot-build rocky-build ubuntu-build windows-build windows-server-2022-build windows-server-2019-build windows-11-build windows-10-build
+build: alpine-build debian-build fedora-build kali-build nixos-build parrot-build rocky-build ubuntu-build windows-build windows-server-2022-build windows-server-2019-build windows-11-build windows-10-build build-arm64 build-riscv64
 
 # --- Local-media Windows (Vista–2016, keyless, sysprep-generalized) ---
 # These install from the MSDN/VL ISOs you place in iso/ (gitignored, see
