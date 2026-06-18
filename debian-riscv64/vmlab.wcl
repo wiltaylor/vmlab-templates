@@ -15,6 +15,7 @@ import <vmlab.wcl>
 template "debian-13" {
   arch     = "riscv64"
   version  = "13.20260617"
+  registry = "ghcr.io/vmlabdev/vmlab-templates/debian-13"
   profile  = "linux-modern"
   firmware = "ovmf"
   cpus     = 2

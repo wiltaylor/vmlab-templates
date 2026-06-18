@@ -18,6 +18,7 @@ import <vmlab.wcl>
 template "home-assistant" {
   arch     = "aarch64"
   version  = "17.3"
+  registry = "ghcr.io/vmlabdev/vmlab-templates/home-assistant"
   profile  = "linux-modern"
   firmware = "ovmf"
   cpus     = 2

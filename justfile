@@ -1,8 +1,6 @@
-# Registry namespace that `*-push` / `push` upload to: templates land under
-# `<registry>/<name>:<version>`. The GHCR namespace must be lowercase (org
-# VMLabDev -> vmlabdev). Override per-invocation, e.g.
-# `just registry=ghcr.io/you/vmlab-templates push`.
-registry := "ghcr.io/vmlabdev/vmlab-templates"
+# Each template declares its own publish repo via the `registry` field in its
+# vmlab.wcl (e.g. ghcr.io/vmlabdev/vmlab-templates/<name>), so `push` needs no
+# namespace here. The GHCR namespace must be lowercase (org VMLabDev -> vmlabdev).
 
 [default, private]
 main:
@@ -198,54 +196,60 @@ ubuntu-riscv64-build: (template-build 'ubuntu-riscv64' 'riscv64/ubuntu-24.04')
 build-riscv64: debian-riscv64-build fedora-riscv64-build ubuntu-riscv64-build
 
 # --- Push built templates to an OCI registry (PRD §6.4) ---
-# Upload a template already in the local store to `{{ registry }}`. The version
-# is taken from the store and used as the tag, so each `arch/name` pushes to
-# `{{ registry }}/<name>:<version>`; pushing several arches of the same
-# name+version merges them into one multi-arch index. Run a
-# build (or `just build`) first — push uploads what is in the store, it does not
-# build. Only the download-backed Linux templates are wired up here; the Windows
-# templates are deliberately omitted (their eval/VL media is not ours to
-# redistribute). Authenticate once with `vmlab template login` beforehand.
+# Upload a template already in the local store. The target repo + version come
+# from the template itself (its `registry` field and the store version), so each
+# `arch/name` pushes to `<registry>/<name>:<version>` and also moves the moving
+# `:latest` tag; pushing several arches of the same name+version merges them into
+# one multi-arch index. Run a build (or `just build`) first — push uploads what
+# is in the store, it does not build. Only the download-backed Linux templates
+# are wired up here; the Windows templates are deliberately omitted (their
+# eval/VL media is not ours to redistribute). Authenticate once with
+# `vmlab template login` beforehand.
 
-# Push one store ref (`<arch>/<name>[@<version>]`) to `{{ registry }}/<name>`
+# Push one store ref to its template's registry, moving `:latest`
 [group('push')]
-template-push ref name:
-	vmlab template push '{{ ref }}' '{{ registry }}/{{ name }}'
+template-push ref:
+	vmlab template push '{{ ref }}'
 
+# Publish any store ref as a pre-release (moves `:latest-prerelease`, not `:latest`)
 [group('push')]
-alpine-push: (template-push 'x86_64/alpine-3.23' 'alpine-3.23')
-[group('push')]
-debian-push: (template-push 'x86_64/debian-13' 'debian-13')
-[group('push')]
-fedora-push: (template-push 'x86_64/fedora-44' 'fedora-44')
-[group('push')]
-kali-push: (template-push 'x86_64/kali' 'kali')
-[group('push')]
-nixos-push: (template-push 'x86_64/nixos-25.11' 'nixos-25.11')
-[group('push')]
-parrot-push: (template-push 'x86_64/parrot' 'parrot')
-[group('push')]
-rocky-push: (template-push 'x86_64/rocky-9' 'rocky-9')
-[group('push')]
-ubuntu-push: (template-push 'x86_64/ubuntu-24.04' 'ubuntu-24.04')
+prerelease ref:
+	vmlab template push --prerelease '{{ ref }}'
 
 [group('push')]
-alpine-arm64-push: (template-push 'aarch64/alpine-3.23' 'alpine-3.23')
+alpine-push: (template-push 'x86_64/alpine-3.23')
 [group('push')]
-debian-arm64-push: (template-push 'aarch64/debian-13' 'debian-13')
+debian-push: (template-push 'x86_64/debian-13')
 [group('push')]
-fedora-arm64-push: (template-push 'aarch64/fedora-44' 'fedora-44')
+fedora-push: (template-push 'x86_64/fedora-44')
 [group('push')]
-home-assistant-arm64-push: (template-push 'aarch64/home-assistant' 'home-assistant')
+kali-push: (template-push 'x86_64/kali')
 [group('push')]
-ubuntu-arm64-push: (template-push 'aarch64/ubuntu-24.04' 'ubuntu-24.04')
+nixos-push: (template-push 'x86_64/nixos-25.11')
+[group('push')]
+parrot-push: (template-push 'x86_64/parrot')
+[group('push')]
+rocky-push: (template-push 'x86_64/rocky-9')
+[group('push')]
+ubuntu-push: (template-push 'x86_64/ubuntu-24.04')
 
 [group('push')]
-debian-riscv64-push: (template-push 'riscv64/debian-13' 'debian-13')
+alpine-arm64-push: (template-push 'aarch64/alpine-3.23')
 [group('push')]
-fedora-riscv64-push: (template-push 'riscv64/fedora-42' 'fedora-42')
+debian-arm64-push: (template-push 'aarch64/debian-13')
 [group('push')]
-ubuntu-riscv64-push: (template-push 'riscv64/ubuntu-24.04' 'ubuntu-24.04')
+fedora-arm64-push: (template-push 'aarch64/fedora-44')
+[group('push')]
+home-assistant-arm64-push: (template-push 'aarch64/home-assistant')
+[group('push')]
+ubuntu-arm64-push: (template-push 'aarch64/ubuntu-24.04')
+
+[group('push')]
+debian-riscv64-push: (template-push 'riscv64/debian-13')
+[group('push')]
+fedora-riscv64-push: (template-push 'riscv64/fedora-42')
+[group('push')]
+ubuntu-riscv64-push: (template-push 'riscv64/ubuntu-24.04')
 
 # Push every arm64 template (merges into the shared multi-arch indexes)
 [group('push')]

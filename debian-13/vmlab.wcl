@@ -13,6 +13,7 @@ import <vmlab.wcl>
 template "debian-13" {
   arch    = "x86_64"
   version = "13.20260601"
+  registry = "ghcr.io/vmlabdev/vmlab-templates/debian-13"
   profile = "linux-modern"
   cpus    = 2
   memory  = "2G"

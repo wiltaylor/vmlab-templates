@@ -11,6 +11,7 @@ import <vmlab.wcl>
 template "fedora-44" {
   arch    = "x86_64"
   version = "44.1.7"
+  registry = "ghcr.io/vmlabdev/vmlab-templates/fedora-44"
   profile = "linux-modern"
   cpus    = 2
   memory  = "2G"
