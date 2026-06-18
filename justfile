@@ -1,6 +1,7 @@
-# Registry namespace that `*-push` / `push` upload to. Override per-invocation,
-# e.g. `just registry=ghcr.io/you push`.
-registry := "ghcr.io/wiltaylor"
+# Registry namespace that `*-push` / `push` upload to: templates land under
+# `<registry>/<name>:<version>`. Override per-invocation, e.g.
+# `just registry=ghcr.io/you/vmlab-templates push`.
+registry := "ghcr.io/wiltaylor/vmlab-templates"
 
 [default, private]
 main:
@@ -197,9 +198,9 @@ build-riscv64: debian-riscv64-build fedora-riscv64-build ubuntu-riscv64-build
 
 # --- Push built templates to an OCI registry (PRD §6.4) ---
 # Upload a template already in the local store to `{{ registry }}`. The version
-# is taken from the store and laid out as the final repo path segment, so each
-# `arch/name` pushes to `{{ registry }}/<name>/<version>`; pushing several
-# arches of the same name+version merges them into one multi-arch index. Run a
+# is taken from the store and used as the tag, so each `arch/name` pushes to
+# `{{ registry }}/<name>:<version>`; pushing several arches of the same
+# name+version merges them into one multi-arch index. Run a
 # build (or `just build`) first — push uploads what is in the store, it does not
 # build. Only the download-backed Linux templates are wired up here; the Windows
 # templates are deliberately omitted (their eval/VL media is not ours to
