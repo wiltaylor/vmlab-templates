@@ -23,6 +23,7 @@ import <vmlab.wcl>
 template "windows-11-arm64" {
   arch    = "aarch64"
   version = "26100.1742"
+  registry = "ghcr.io/vmlabdev/vmlab-templates/windows-11-arm64"
   profile = "windows-11"
   cpus    = 4
   memory  = "8G"

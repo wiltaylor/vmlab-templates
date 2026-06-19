@@ -14,6 +14,7 @@ import <vmlab.wcl>
 template "windows-10" {
   arch    = "x86_64"
   version = "19045.2006"
+  registry = "ghcr.io/vmlabdev/vmlab-templates/windows-10"
   profile = "windows-10"
   cpus    = 4
   memory  = "8G"
