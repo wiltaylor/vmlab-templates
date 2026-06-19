@@ -26,6 +26,24 @@ All Windows eval ISOs are downloaded and sha256-verified by vmlab just like the
 Linux ones; `fetch-deps.sh` only fetches the virtio guest drivers that get baked
 into the answer-file media (and `just` runs it for you).
 
+### Vintage x86 (DOS / Windows 3.x–2000)
+
+These predate answer files and have no guest agent, so they install from local
+or downloaded media driven over the live screen (VNC + OCR). They run on the
+x86_64 emulator but show as arch `x86`. Built via `just build-vintage` (the
+proprietary entries need their ISOs placed in `iso/` first — see `iso/README.md`).
+
+| Directory | OS | Source strategy |
+|---|---|---|
+| `freedos-1.3/` | FreeDOS 1.3 (Full set) | LiveCD download + sha256 (run `fetch-deps.sh` first); **publishable** |
+| `dos-6.22/` | MS-DOS 6.22 | Local bootable ISO, screen-driven install |
+| `windows-3.11/` | Windows for Workgroups 3.11 | Pre-installed tree layered on `dos-6.22` |
+| `windows-2000/` | Windows 2000 Professional SP4 | Local ISO + `winnt.sif` unattend (needs `.env` key) |
+
+FreeDOS is the one vintage template that is FOSS / freely redistributable, so it
+is download-backed and can be pushed to the registry (`just freedos-push`); the
+proprietary entries are local-only.
+
 ### arm64 (aarch64)
 
 These build the same distros for `aarch64`, all from cloud images +

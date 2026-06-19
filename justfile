@@ -134,6 +134,21 @@ build-windows-local: windows-vista-build windows-vista-x86-build windows-7-build
 # over the live screen (VNC + OCR), since they predate answer files and have no
 # guest agent. They run on the x86_64 emulator but show as arch `x86`.
 
+# Build the FreeDOS 1.3 template (Full package set, FDI-driven install)
+[group('build-vintage')]
+freedos-build:
+	#!/usr/bin/env bash
+	set -euo pipefail
+	# --version pins 1.3 (the upstream release) instead of auto-incrementing, so
+	# rebuilds stay 1.3 — the FreeDOS version, not a vmlab build counter.
+	if found=$(vmlab template exists 'x86/freedos-1.3' 2>/dev/null); then
+		echo "$found already in the store; skipping (vmlab template rm to rebuild)"
+		exit 0
+	fi
+	cd freedos-1.3
+	./fetch-deps.sh
+	vmlab template build --version 1.3
+
 # Build the MS-DOS 6.22 template (bootable C:, driven install)
 [group('build-vintage')]
 dos-6-22-build: (template-build 'dos-6.22' 'x86/dos-6.22')
@@ -148,7 +163,7 @@ windows-2000-build: (template-build 'windows-2000' 'x86/windows-2000')
 
 # Build every vintage x86 template into the local store
 [group('build-vintage')]
-build-vintage: dos-6-22-build windows-3-11-build windows-2000-build
+build-vintage: freedos-build dos-6-22-build windows-3-11-build windows-2000-build
 
 # Build the Alpine Linux 3.23 arm64 template (runs under TCG on x86 hosts)
 [group('build-arm64')]
@@ -232,6 +247,13 @@ parrot-push: (template-push 'x86_64/parrot')
 rocky-push: (template-push 'x86_64/rocky-9')
 [group('push')]
 ubuntu-push: (template-push 'x86_64/ubuntu-24.04')
+
+# FreeDOS 1.3 is FOSS/redistributable (unlike the other vintage + Windows media),
+# so it is safe to publish; kept standalone, not in the `push` aggregate.
+
+# Push the FreeDOS 1.3 template to its registry
+[group('push')]
+freedos-push: (template-push 'x86/freedos-1.3')
 
 [group('push')]
 alpine-arm64-push: (template-push 'aarch64/alpine-3.23')
