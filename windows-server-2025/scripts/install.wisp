@@ -51,8 +51,8 @@ fn install(lab: Lab) -> Result[unit, string] {
 // The answer file and the generalize script ride the UNATTEND ISO; copy them onto
 // the disk first since the ISO is not attached to lab clones.
 //
-// generalize.ps1 does the real work: sysprep /generalize aborts on the 26100
-// codebase when an AppX package is "installed for a user but not provisioned"
+// generalize.ps1 does the real work: sysprep /generalize aborts on modern Windows
+// codebases when an AppX package is "installed for a user but not provisioned"
 // (0x80073cf2), and those consumer packages register asynchronously after first
 // logon, so the script runs sysprep in a loop, removing exactly the package each
 // failed pass names until sysprep writes its success tag. It judges success by
