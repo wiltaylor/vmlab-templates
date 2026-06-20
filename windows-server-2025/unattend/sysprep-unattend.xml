@@ -7,8 +7,16 @@
   Administrator account comes back with the lab password plus a single
   autologon. The QEMU guest agent service survives generalize, so clones
   still report "ready".
+
+  The guest agent can answer guest-ping WHILE specialize is still running, so
+  agent-up alone is too early to call a clone "ready". A FirstLogonCommands
+  entry (oobeSystem, below) writes C:\Windows\Temp\vmlab-firstboot.done after
+  the autologon — i.e. once specialize + OOBE genuinely finished. vmlab's
+  first-boot provision (first_boot = scripts/firstboot.wisp) waits for that
+  marker, deletes it, and only then reports the VM provisioned.
 -->
-<unattend xmlns="urn:schemas-microsoft-com:unattend">
+<unattend xmlns="urn:schemas-microsoft-com:unattend"
+          xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
 
   <settings pass="generalize">
     <!-- The clone runs on identical virtual hardware; keeping device
@@ -68,6 +76,18 @@
           <PlainText>true</PlainText>
         </Password>
       </AutoLogon>
+
+      <!-- Runs on the first (auto)logon, after specialize + OOBE complete.
+           Drops the marker vmlab's first-boot provision waits on. Using
+           FirstLogonCommands rather than SetupComplete.cmd, which does not
+           run on these generalized clones. -->
+      <FirstLogonCommands>
+        <SynchronousCommand wcm:action="add">
+          <Order>1</Order>
+          <CommandLine>cmd /c echo ready&gt; C:\Windows\Temp\vmlab-firstboot.done</CommandLine>
+          <Description>vmlab first-boot ready marker</Description>
+        </SynchronousCommand>
+      </FirstLogonCommands>
     </component>
   </settings>
 </unattend>
