@@ -1,4 +1,4 @@
-// templates.vmlab.dev — the vmlab template-library site, authored in wdoc.
+// templates.vmlab.io — the vmlab template-library site, authored in wdoc.
 //
 //   wcl wdoc build docs/main.wcl --out docs/_site     (just docs-build)
 //   wcl wdoc serve docs/main.wcl                       (just docs-serve)
