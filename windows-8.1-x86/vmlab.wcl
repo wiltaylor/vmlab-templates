@@ -15,13 +15,13 @@ template "windows-8.1" {
   version = "9600.0"
   profile = "windows-legacy"
   cpus    = 2
-  memory  = "3G"
-  disk    = "40G"
+  memory  = 3GiB
+  disk    = 40GiB
 
   source "iso" { path = "../iso/en_windows_8_1_enterprise_x86_dvd_2972289.iso" }
 
   media { kind = "floppy" from = "./unattend/" label = "UNATTEND" }
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

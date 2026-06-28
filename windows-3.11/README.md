@@ -7,14 +7,14 @@ auto-launches Program Manager at boot.
 
 This is **not** a setup-driven install. `../iso/Windows-3.11-stock.zip`
 (gitignored) is a *pre-installed* WfW 3.11 tree. The template layers on the
-`x86/dos-6.22` template (build that first) and the provision wisp copies the
+`x86/dos-6.22` template (build that first) and the provision wscript copies the
 Windows tree onto C:.
 
 - `fetch-deps.sh` extracts the zip into `./win311/` (gitignored) and patches
   `SYSTEM.INI` from the stock S3 Trio64V display driver — which QEMU does not
   emulate — to the generic **VGA** driver (`VGA.DRV` + its grabber/fonts are
   already in the tree). `./win311/` is built into the `WIN311` media ISO.
-- `scripts/install.wisp` boots the dos-6.22 disk, loads the Oak CD driver that
+- `scripts/install.ws` boots the dos-6.22 disk, loads the Oak CD driver that
   dos-6.22 already carries in `C:\DOS` (`cd1.sys` + `MSCDEX`) to mount the CD at
   `R:`, `xcopy`s `WINDOWS`/`WIN32APP` onto C:, writes a `HIMEM`-based
   `CONFIG.SYS` and an `AUTOEXEC.BAT` that launches `win`, then verifies Program

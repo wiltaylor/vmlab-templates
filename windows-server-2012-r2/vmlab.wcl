@@ -15,13 +15,13 @@ template "windows-server-2012-r2" {
   version = "9600.0"
   profile = "windows-legacy"
   cpus    = 2
-  memory  = "4G"
-  disk    = "40G"
+  memory  = 4GiB
+  disk    = 40GiB
 
   source "iso" { path = "../iso/en_windows_server_2012_r2_x64_dvd_2707946.iso" }
 
   media { kind = "floppy" from = "./unattend/" label = "UNATTEND" }
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

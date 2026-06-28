@@ -15,13 +15,13 @@ template "windows-vista" {
   version = "6002.0"
   profile = "windows-legacy"
   cpus    = 2
-  memory  = "3G"
-  disk    = "40G"
+  memory  = 3GiB
+  disk    = 40GiB
 
   source "iso" { path = "../iso/en_windows_vista_ee_x86_dvd_vl_x13-17271.iso" }
 
   media { kind = "floppy" from = "./unattend/" label = "UNATTEND" }
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

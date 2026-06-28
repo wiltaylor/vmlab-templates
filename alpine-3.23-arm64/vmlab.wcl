@@ -17,8 +17,8 @@ template "alpine-3.23" {
   profile  = "linux-modern"
   firmware = "ovmf"
   cpus     = 1
-  memory   = "1G"
-  disk     = "10G"
+  memory   = 1GiB
+  disk     = 10GiB
 
   source "qcow2" {
     url    = "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/nocloud_alpine-3.23.4-aarch64-uefi-cloudinit-r0.qcow2"
@@ -28,5 +28,5 @@ template "alpine-3.23" {
   media { kind = "iso" from = "./cloudinit/" label = "CIDATA" }
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

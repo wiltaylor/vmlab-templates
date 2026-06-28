@@ -4,7 +4,7 @@
 // The ../iso payload is a *pre-installed* WfW 3.11 tree, not an installer, so
 // there is no GUI setup to drive. fetch-deps.sh extracts it (patching the
 // display driver from the unemulated S3 Trio to generic VGA) into ./win311/,
-// which is built into the WIN311 media ISO. The build provision wisp boots the
+// which is built into the WIN311 media ISO. The build provision wscript boots the
 // dos-6.22 disk, loads the CD driver that dos-6.22 already carries in C:\DOS,
 // copies the WINDOWS tree onto C:, and configures DOS to launch Windows.
 
@@ -15,15 +15,15 @@ template "windows-3.11" {
   version = "3.11"
   profile = "windows-9x"
   cpus    = 1
-  memory  = "64M"
-  disk    = "1G"
+  memory  = 64MiB
+  disk    = 1GiB
 
   // Seed from the bootable MS-DOS 6.22 disk; its C:\DOS already holds the Oak
-  // CD driver (cd1.sys) + MSCDEX that the install wisp uses to read the media.
+  // CD driver (cd1.sys) + MSCDEX that the install wscript uses to read the media.
   source "template" { from = "x86/dos-6.22" }
 
   // The extracted WfW 3.11 tree, surfaced to the guest as a CD-ROM.
   media { kind = "iso" from = "./win311/" label = "WIN311" }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

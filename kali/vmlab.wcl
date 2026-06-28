@@ -16,12 +16,12 @@ template "kali" {
   registry = "ghcr.io/vmlabdev/vmlab-templates/kali"
   profile = "linux-generic"
   cpus    = 2
-  memory  = "4G"
-  disk    = "40G"
+  memory  = 4GiB
+  disk    = 40GiB
 
   source "qcow2" { path = "./disk/kali.qcow2" }
 
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

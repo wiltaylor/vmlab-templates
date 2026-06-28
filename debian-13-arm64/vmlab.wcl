@@ -18,8 +18,8 @@ template "debian-13" {
   profile  = "linux-modern"
   firmware = "ovmf"
   cpus     = 2
-  memory   = "2G"
-  disk     = "20G"
+  memory   = 2GiB
+  disk     = 20GiB
 
   source "qcow2" {
     url    = "https://cloud.debian.org/images/cloud/trixie/20260601-2496/debian-13-genericcloud-arm64-20260601-2496.qcow2"
@@ -29,5 +29,5 @@ template "debian-13" {
   media { kind = "iso" from = "./cloudinit/" label = "CIDATA" }
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

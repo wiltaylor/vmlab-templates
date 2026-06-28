@@ -18,7 +18,7 @@ over the live screen (VNC + OCR), the same way `dos-6.22` is built.
 - `fetch-deps.sh` downloads the official `FD13-LiveCD.zip`, sha256-verifies it,
   and extracts `FD13LIVE.iso` (gitignored). vmlab's URL sources can't unpack the
   multi-file zip, hence the script.
-- `scripts/install.wisp` boots the LiveCD, drives FDI through language → welcome →
+- `scripts/install.ws` boots the LiveCD, drives FDI through language → welcome →
   auto-partition (which forces a reboot) → format → **Full** package set →
   install, then `poweroff`s to seal a bootable C: (FreeDOS has no ACPI, so a clean
   QMP quit is what flushes the qcow2).

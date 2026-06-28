@@ -17,8 +17,8 @@ template "windows-11" {
   registry = "ghcr.io/vmlabdev/vmlab-templates/windows-11"
   profile = "windows-11"
   cpus    = 4
-  memory  = "8G"
-  disk    = "60G"
+  memory  = 8GiB
+  disk    = 60GiB
 
   source "iso" {
     url    = "https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26100.1742.240906-0331.ge_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso"
@@ -28,10 +28,10 @@ template "windows-11" {
   media { kind = "iso" from = "./unattend/" label = "UNATTEND" }
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 
   // Runs on every clone's first boot, before the VM is reported ready: waits
   // for sysprep specialize/OOBE to finish (the specialize-pass marker), then
   // clears it. So labs using this template never see a half-specialized clone.
-  first_boot = "scripts/firstboot.wisp"
+  first_boot = "scripts/firstboot.ws"
 }

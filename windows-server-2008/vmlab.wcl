@@ -15,13 +15,13 @@ template "windows-server-2008" {
   version = "6001.0"
   profile = "windows-legacy"
   cpus    = 2
-  memory  = "4G"
-  disk    = "40G"
+  memory  = 4GiB
+  disk    = 40GiB
 
   source "iso" { path = "../iso/en_windows_server_2008_x64_dvd_x14-26714.iso" }
 
   media { kind = "floppy" from = "./unattend/" label = "UNATTEND" }
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

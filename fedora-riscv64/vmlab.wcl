@@ -17,8 +17,8 @@ template "fedora-42" {
   profile  = "linux-modern"
   firmware = "ovmf"
   cpus     = 2
-  memory   = "2G"
-  disk     = "20G"
+  memory   = 2GiB
+  disk     = 20GiB
 
   source "qcow2" {
     url    = "https://dl.fedoraproject.org/pub/alt/risc-v/release/42/Cloud/riscv64/images/Fedora-Cloud-Base-Generic-42.20250911-2251ba41cdd3.riscv64.qcow2"
@@ -28,5 +28,5 @@ template "fedora-42" {
   media { kind = "iso" from = "./cloudinit/" label = "CIDATA" }
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

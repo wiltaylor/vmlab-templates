@@ -16,8 +16,8 @@ template "windows-server-2019" {
   registry = "ghcr.io/vmlabdev/vmlab-templates/windows-server-2019"
   profile = "windows-server"
   cpus    = 4
-  memory  = "8G"
-  disk    = "60G"
+  memory  = 8GiB
+  disk    = 60GiB
 
   source "iso" {
     url    = "https://software-static.download.prss.microsoft.com/pr/download/17763.737.190906-2324.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us_1.iso"
@@ -27,10 +27,10 @@ template "windows-server-2019" {
   media { kind = "iso" from = "./unattend/" label = "UNATTEND" }
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 
   // Runs on every clone's first boot, before the VM is reported ready: waits
   // for sysprep specialize/OOBE to finish (the specialize-pass marker), then
   // clears it. So labs using this template never see a half-specialized clone.
-  first_boot = "scripts/firstboot.wisp"
+  first_boot = "scripts/firstboot.ws"
 }

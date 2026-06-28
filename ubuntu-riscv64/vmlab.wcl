@@ -18,8 +18,8 @@ template "ubuntu-24.04" {
   profile  = "linux-modern"
   firmware = "ovmf"
   cpus     = 2
-  memory   = "2G"
-  disk     = "20G"
+  memory   = 2GiB
+  disk     = 20GiB
 
   source "qcow2" {
     url    = "https://cloud-images.ubuntu.com/noble/20260518/noble-server-cloudimg-riscv64.img"
@@ -29,5 +29,5 @@ template "ubuntu-24.04" {
   media { kind = "iso" from = "./cloudinit/" label = "CIDATA" }
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

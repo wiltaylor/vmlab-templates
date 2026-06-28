@@ -5,7 +5,7 @@
 // fetch-deps.sh downloads + sha256-verifies the official LiveCD zip and extracts
 // FD13LIVE.iso (gitignored). FreeDOS has no answer file and no QEMU guest agent,
 // so the build's FDI installer is driven over the live screen (VNC + OCR) by the
-// provision wisp, just like dos-6.22.
+// provision wscript, just like dos-6.22.
 
 import <vmlab.wcl>
 
@@ -15,10 +15,10 @@ template "freedos-1.3" {
   registry = "ghcr.io/vmlabdev/vmlab-templates/freedos-1.3"
   profile  = "windows-9x"
   cpus     = 1
-  memory   = "64M"        // FreeDOS is happy small; the LiveCD warns about its RAM
+  memory   = 64MiB        // FreeDOS is happy small; the LiveCD warns about its RAM
                           // drive even at 256M, so the bump buys nothing
-  disk     = "2G"         // Full install (BASE + apps/bonus) needs the room
+  disk     = 2GiB         // Full install (BASE + apps/bonus) needs the room
 
   source "iso" { path = "./FD13LIVE.iso" }
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

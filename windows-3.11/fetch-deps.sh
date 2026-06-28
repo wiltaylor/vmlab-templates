@@ -2,7 +2,7 @@
 # Stage the Windows for Workgroups 3.11 payload for the media ISO.
 #
 # ../iso/Windows-3.11-stock.zip is not an installer — it is a *pre-installed*
-# WfW 3.11 tree (WINDOWS/, WIN32APP/, windows.bat). The build's install.wisp
+# WfW 3.11 tree (WINDOWS/, WIN32APP/, windows.bat). The build's install.ws
 # copies it onto the dos-6.22 base disk. We only have to (a) extract it and
 # (b) point its display driver at the generic VGA driver: the stock SYSTEM.INI
 # is configured for an S3 Trio64V card, which QEMU does not emulate, so on the

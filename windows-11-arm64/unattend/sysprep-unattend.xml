@@ -21,7 +21,7 @@
   agent-up alone is too early to call a clone "ready". A specialize-pass
   RunSynchronousCommand (below) writes C:\Windows\Temp\vmlab-firstboot.done as
   SYSTEM (no logon needed); vmlab's first-boot provision
-  (first_boot = scripts/firstboot.wisp) waits for that marker, deletes it, and
+  (first_boot = scripts/firstboot.ws) waits for that marker, deletes it, and
   only then reports the VM provisioned.
 -->
 <unattend xmlns="urn:schemas-microsoft-com:unattend"

@@ -39,7 +39,7 @@ succeeds.
 
 - **Speed.** On an x86 host there is no KVM for aarch64, so the entire guest
   runs under TCG emulation. A Windows install that takes ~30 min natively can
-  take **many hours** here; `scripts/install.wisp` waits up to 8h for the guest
+  take **many hours** here; `scripts/install.ws` waits up to 8h for the guest
   agent. On a real arm64 host (KVM) it is far quicker.
 - **Guest-tools/agent packaging.** ARM64 boot drivers (`viostor`/`netkvm`
   under `w11/ARM64`) are present on `virtio-win.iso`, but the guest-tools and

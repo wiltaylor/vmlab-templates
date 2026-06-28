@@ -14,8 +14,8 @@ template "ubuntu-24.04" {
   registry = "ghcr.io/vmlabdev/vmlab-templates/ubuntu-24.04"
   profile = "linux-modern"
   cpus    = 2
-  memory  = "4G"
-  disk    = "20G"
+  memory  = 4GiB
+  disk    = 20GiB
 
   source "iso" {
     url    = "https://releases.ubuntu.com/24.04/ubuntu-24.04.4-live-server-amd64.iso"
@@ -25,5 +25,5 @@ template "ubuntu-24.04" {
   media { kind = "iso" from = "./cloudinit/" label = "CIDATA" }
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

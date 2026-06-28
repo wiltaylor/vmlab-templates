@@ -16,12 +16,12 @@ template "parrot" {
   registry = "ghcr.io/vmlabdev/vmlab-templates/parrot"
   profile = "linux-modern"
   cpus    = 2
-  memory  = "4G"
-  disk    = "40G"
+  memory  = 4GiB
+  disk    = 40GiB
 
   source "qcow2" { path = "./disk/parrot.qcow2" }
 
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

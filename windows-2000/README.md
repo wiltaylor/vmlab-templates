@@ -7,7 +7,7 @@ Builds `x86/windows-2000`, installed unattended from the bootable SP4 CD.
   `winnt.sif.in` and builds `./answer/` → an `A:` floppy. CD-boot Setup reads
   `A:\winnt.sif` automatically and runs fully unattended (auto-partition,
   format NTFS, admin password `vmlab`, auto-logon).
-- `scripts/install.wisp` nudges the one-time boot-CD prompt, then watches the
+- `scripts/install.ws` nudges the one-time boot-CD prompt, then watches the
   screen through text Setup → GUI Setup → desktop and seals with an ACPI
   shutdown.
 

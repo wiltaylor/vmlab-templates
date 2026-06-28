@@ -1,6 +1,6 @@
 #!/bin/sh
 # Runs as root inside the NixOS installer environment (typed in by
-# scripts/install.wisp from the NIXSETUP media ISO). Partitions the
+# scripts/install.ws from the NIXSETUP media ISO). Partitions the
 # virtio disk GPT/UEFI, installs with the configuration.nix shipped on
 # the same ISO, and powers off so the build can seal the disk.
 set -eux

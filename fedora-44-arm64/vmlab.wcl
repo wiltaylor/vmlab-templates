@@ -16,8 +16,8 @@ template "fedora-44" {
   profile  = "linux-modern"
   firmware = "ovmf"
   cpus     = 2
-  memory   = "2G"
-  disk     = "20G"
+  memory   = 2GiB
+  disk     = 20GiB
 
   source "qcow2" {
     url    = "https://download.fedoraproject.org/pub/fedora/linux/releases/44/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-44-1.7.aarch64.qcow2"
@@ -27,5 +27,5 @@ template "fedora-44" {
   media { kind = "iso" from = "./cloudinit/" label = "CIDATA" }
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

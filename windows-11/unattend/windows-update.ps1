@@ -8,7 +8,7 @@
 #
 # This is ONE pass on purpose: updates that need a reboot, or that only become
 # applicable after an earlier wave installs, won't all appear in a single
-# search. The caller (install.wisp) reboots and re-runs us until we report
+# search. The caller (install.ws) reboots and re-runs us until we report
 # WU_RESULT=NONE. The last line of stdout is always a sentinel the caller parses:
 #
 #   WU_RESULT=NONE        no applicable updates remain   -> caller stops looping

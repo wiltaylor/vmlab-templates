@@ -22,8 +22,8 @@ template "home-assistant" {
   profile  = "linux-modern"
   firmware = "ovmf"
   cpus     = 2
-  memory   = "2G"
-  disk     = "32G"
+  memory   = 2GiB
+  disk     = 32GiB
 
   source "qcow2" {
     url    = "https://github.com/home-assistant/operating-system/releases/download/17.3/haos_generic-aarch64-17.3.qcow2.xz"
@@ -32,5 +32,5 @@ template "home-assistant" {
 
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

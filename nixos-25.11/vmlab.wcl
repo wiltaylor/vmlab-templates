@@ -17,8 +17,8 @@ template "nixos-25.11" {
   registry = "ghcr.io/vmlabdev/vmlab-templates/nixos-25.11"
   profile = "linux-modern"
   cpus    = 2
-  memory  = "4G"
-  disk    = "20G"
+  memory  = 4GiB
+  disk    = 20GiB
 
   source "iso" {
     url    = "https://releases.nixos.org/nixos/25.11/nixos-25.11.11994.e820eb4a444b/nixos-minimal-25.11.11994.e820eb4a444b-x86_64-linux.iso"
@@ -28,5 +28,5 @@ template "nixos-25.11" {
   media { kind = "iso" from = "./nix/" label = "NIXSETUP" }
   nic { nat = true }
 
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }

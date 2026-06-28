@@ -27,7 +27,7 @@ HAOS is a sealed appliance:
     nat    = true
     forward { host_port = 8123 to = "ha:8123" }
   }
-  vm "ha" { template = "aarch64/home-assistant" memory = "2G"
+  vm "ha" { template = "aarch64/home-assistant" memory = 2GiB
             nic { segment = "lan" } }
   ```
 

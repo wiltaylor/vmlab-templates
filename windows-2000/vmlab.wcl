@@ -2,7 +2,7 @@
 // windows-9x profile (i440fx/SeaBIOS/IDE, Cirrus VGA, AMD PCnet NIC). The
 // bootable CD installs unattended: Setup reads A:\winnt.sif (the answer floppy
 // built from ./answer/ by fetch-deps.sh, key injected from .env) automatically.
-// No guest agent on Win2000, so the build provision wisp only nudges the
+// No guest agent on Win2000, so the build provision wscript only nudges the
 // CD-boot prompt and watches the screen until the desktop appears.
 
 import <vmlab.wcl>
@@ -12,11 +12,11 @@ template "windows-2000" {
   version = "2195.0"
   profile = "windows-9x"
   cpus    = 1
-  memory  = "512M"
-  disk    = "10G"
+  memory  = 512MiB
+  disk    = 10GiB
 
   source "iso" { path = "../iso/Windows-2000-Professional-SP4.iso" }
   // Unattended answer file: CD-boot Setup auto-reads A:\winnt.sif.
   media { kind = "floppy" from = "./answer/" label = "WINNT" }
-  provision "scripts/install.wisp" { }
+  provision "scripts/install.ws" { }
 }
